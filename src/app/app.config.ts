@@ -23,7 +23,6 @@ const toolbar = [
   ['clean'], // remove formatting button
 
   ['link', 'image', 'video'], // link and image, video
-  ['pdf'],
 ];
 const pdfHandler = (event: any) => {
   console.log(event);
