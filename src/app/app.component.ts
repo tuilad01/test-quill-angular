@@ -3,18 +3,59 @@ import { RouterOutlet } from '@angular/router';
 import { ContentChange, QuillEditorComponent, QuillModule } from 'ngx-quill';
 import { ListBlot } from './quill/formats/list';
 import { ListItemBlot } from './quill/formats/list-item';
-import Quill from 'quill/core';
+import Quill, { Delta, Op } from 'quill';
+import { JsonPipe } from '@angular/common';
 @Component({
   selector: 'app-root',
-  imports: [QuillModule],
+  imports: [QuillModule, JsonPipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
+  handleEditorCreated($event: Quill) {
+    this.quill = $event;
+  }
+  insertFormula() {
+    if (!this.quill) {
+      return;
+    }
+
+    const savedDelta = this.quill.insertEmbed(
+      this.quill.getSelection()?.index || 0,
+      'custom-formula',
+      { formula: 'MAX(1,2)', result: '3' },
+      'api'
+    );
+
+    console.log('savedDelta', savedDelta);
+  }
+
+  insertFormulaDelta() {
+    const ops = JSON.parse(
+      '{ "ops": [ { "insert": { "custom-formula": { "formula": "MAX(1,2)", "result": "3" } } }, { "insert": "\\n" } ] }'
+    ) as Op[];
+    const delta = new Delta(ops);
+    this.quill?.insertText(
+      this.quill.getSelection()?.index || 0,
+
+      '\n',
+      Quill.sources.USER
+    );
+    this.quill?.editor.insertContents(
+      (this.quill.getSelection()?.index || 0) + 1,
+      delta
+    );
+  }
+
+  logDelta() {
+    console.log(JSON.stringify(this.quill?.getContents()));
+  }
+
   title = 'quill-app';
   delta: string = '';
   parchment: string = '';
   @ViewChild('editor') editor!: QuillEditorComponent;
+  quill?: Quill;
 
   handleContentChanged(contentChange: ContentChange) {
     this.delta = JSON.stringify(contentChange.content);

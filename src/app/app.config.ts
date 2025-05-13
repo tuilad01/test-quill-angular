@@ -23,7 +23,11 @@ const toolbar = [
   ['clean'], // remove formatting button
 
   ['link', 'image', 'video'], // link and image, video
+  ['pdf'],
 ];
+const pdfHandler = (event: any) => {
+  console.log(event);
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,6 +37,9 @@ export const appConfig: ApplicationConfig = {
       theme: 'snow',
       modules: {
         toolbar: toolbar,
+        handlers: {
+          pdf: pdfHandler,
+        },
       },
     }),
   ],
